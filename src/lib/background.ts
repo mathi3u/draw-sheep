@@ -125,6 +125,9 @@ export function renderBackground(
   // Subtle craters
   drawCraters(ctx, geo)
 
+  // Flowers on the surface
+  drawFlowers(ctx, geo, time)
+
   // Surface rim highlight
   ctx.beginPath()
   ctx.arc(geo.cx, geo.cy, geo.radius, -Math.PI * 0.75, -Math.PI * 0.25)
@@ -156,6 +159,69 @@ function drawCraters(ctx: CanvasRenderingContext2D, geo: PlanetGeometry): void {
     ctx.lineWidth = 1
     ctx.stroke()
   }
+}
+
+function drawFlower(
+  ctx: CanvasRenderingContext2D,
+  geo: PlanetGeometry,
+  angle: number,
+  size: number,
+  petalColor: string,
+  centerColor: string,
+  time: number,
+): void {
+  const surfaceX = geo.cx + geo.radius * Math.cos(angle)
+  const surfaceY = geo.cy - geo.radius * Math.sin(angle)
+
+  ctx.save()
+  ctx.translate(surfaceX, surfaceY)
+  ctx.rotate(Math.PI / 2 - angle)
+
+  // Gentle sway
+  const sway = Math.sin(time * 1.2) * 0.06
+  ctx.rotate(sway)
+
+  // Stem
+  ctx.beginPath()
+  ctx.moveTo(0, 0)
+  ctx.quadraticCurveTo(size * 0.15, -size * 0.5, 0, -size)
+  ctx.strokeStyle = '#4a7a3a'
+  ctx.lineWidth = 1.5
+  ctx.stroke()
+
+  // Small leaf
+  ctx.beginPath()
+  ctx.ellipse(size * 0.2, -size * 0.4, size * 0.18, size * 0.07, 0.4, 0, Math.PI * 2)
+  ctx.fillStyle = '#5a8a4a'
+  ctx.fill()
+
+  // Petals
+  const petalCount = 5
+  const petalSize = size * 0.22
+  for (let i = 0; i < petalCount; i++) {
+    const a = (i / petalCount) * Math.PI * 2
+    const px = Math.cos(a) * petalSize * 0.8
+    const py = -size + Math.sin(a) * petalSize * 0.8
+    ctx.beginPath()
+    ctx.ellipse(px, py, petalSize, petalSize * 0.6, a, 0, Math.PI * 2)
+    ctx.fillStyle = petalColor
+    ctx.fill()
+  }
+
+  // Center
+  ctx.beginPath()
+  ctx.arc(0, -size, size * 0.12, 0, Math.PI * 2)
+  ctx.fillStyle = centerColor
+  ctx.fill()
+
+  ctx.restore()
+}
+
+function drawFlowers(ctx: CanvasRenderingContext2D, geo: PlanetGeometry, time: number): void {
+  // Rose (the iconic one) — right of center
+  drawFlower(ctx, geo, 1.25, 18, '#e0586e', '#f0c860', time)
+  // Small yellow flower — left of center
+  drawFlower(ctx, geo, 1.75, 12, '#f0d060', '#c07030', time + 2)
 }
 
 export function resetStars(): void {

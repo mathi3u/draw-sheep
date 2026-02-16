@@ -4,49 +4,61 @@ import { useCallback, useEffect, useState } from 'react'
 import SheepCanvas from '@/components/SheepCanvas'
 import DrawModal from '@/components/DrawModal'
 import InfoModal from '@/components/InfoModal'
-import { addSheep, getActiveSheep, getSheep, removeSheep, amnesty } from '@/lib/sheep-store'
-import { addSampleSheep } from '@/lib/sample-sheep'
 import type { SheepDrawing, Stroke } from '@/lib/types'
 
 export default function Home() {
-  const [activeSheep, setActiveSheep] = useState<SheepDrawing[]>([])
   const [allSheep, setAllSheep] = useState<SheepDrawing[]>([])
   const [showDraw, setShowDraw] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
   const [newSheepId, setNewSheepId] = useState<string | null>(null)
+  const [loaded, setLoaded] = useState(false)
 
-  const refresh = useCallback(() => {
-    setActiveSheep(getActiveSheep())
-    setAllSheep(getSheep())
+  const activeSheep = allSheep.filter(s => !s.removed)
+
+  const fetchSheep = useCallback(async () => {
+    const res = await fetch('/api/sheep')
+    const data: SheepDrawing[] = await res.json()
+    setAllSheep(data)
+    return data
   }, [])
 
   useEffect(() => {
-    const isFirstVisit = getSheep().length === 0
-    if (isFirstVisit) {
-      addSampleSheep()
-      setShowDraw(true)
-    }
-    refresh()
-  }, [refresh])
+    fetchSheep().then(async data => {
+      if (data.length === 0) {
+        // Seed sample sheep on first visit
+        await fetch('/api/sheep/seed', { method: 'POST' })
+        await fetchSheep()
+        setShowDraw(true)
+      }
+      setLoaded(true)
+    })
+  }, [fetchSheep])
 
-  const handleSubmit = (layers: { body: Stroke[]; hindLegs: Stroke[]; frontLegs: Stroke[] }) => {
-    const sheep = addSheep(layers)
+  const handleSubmit = async (layers: { body: Stroke[]; hindLegs: Stroke[]; frontLegs: Stroke[] }) => {
+    const res = await fetch('/api/sheep', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(layers),
+    })
+    const sheep: SheepDrawing = await res.json()
+    setAllSheep(prev => [...prev, sheep])
     setNewSheepId(sheep.id)
-    refresh()
     setShowDraw(false)
   }
 
-  const handleRemove = (id: string) => {
-    removeSheep(id)
-    refresh()
+  const handleRemove = async (id: string) => {
+    await fetch(`/api/sheep/${id}`, { method: 'DELETE' })
+    setAllSheep(prev => prev.map(s => s.id === id ? { ...s, removed: true } : s))
   }
 
-  const handleAmnesty = () => {
-    amnesty()
-    refresh()
+  const handleAmnesty = async () => {
+    await fetch('/api/sheep/amnesty', { method: 'POST' })
+    setAllSheep(prev => prev.map(s => ({ ...s, removed: false })))
   }
 
   const removedCount = allSheep.filter(s => s.removed).length
+
+  if (!loaded) return null
 
   return (
     <>
@@ -76,7 +88,7 @@ export default function Home() {
       {/* Info button */}
       <button
         onClick={() => setShowInfo(true)}
-        className="fixed bottom-6 left-6 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white text-lg flex items-center justify-center transition-colors"
+        className="fixed bottom-6 right-20 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white text-lg flex items-center justify-center transition-colors"
       >
         ?
       </button>
