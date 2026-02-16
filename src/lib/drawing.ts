@@ -12,11 +12,11 @@ export function undoLastStroke(strokes: Stroke[]): Stroke[] {
   return strokes.slice(0, -1)
 }
 
-export function renderStrokes(ctx: CanvasRenderingContext2D, strokes: Stroke[]): void {
+export function renderStrokes(ctx: CanvasRenderingContext2D, strokes: Stroke[], colorOverride?: string): void {
   for (const stroke of strokes) {
     if (stroke.points.length < 2) continue
     ctx.beginPath()
-    ctx.strokeStyle = stroke.color
+    ctx.strokeStyle = colorOverride ?? stroke.color
     ctx.lineWidth = stroke.size
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'

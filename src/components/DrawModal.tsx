@@ -7,9 +7,9 @@ import { createStroke, addPoint, undoLastStroke, renderStrokes } from '@/lib/dra
 type Layer = 'body' | 'hindLegs' | 'frontLegs'
 
 const LAYER_COLORS: Record<Layer, string> = {
-  body: '#333333',
-  hindLegs: '#e74c3c',
-  frontLegs: '#3498db',
+  body: '#ffffff',
+  hindLegs: '#ff9999',
+  frontLegs: '#99bbff',
 }
 
 const LAYER_LABELS: Record<Layer, string> = {
@@ -45,7 +45,7 @@ export default function DrawModal({ onSubmit, onClose }: DrawModalProps) {
     if (!ctx) return
 
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-    ctx.fillStyle = '#ffffff'
+    ctx.fillStyle = '#1a1f3e'
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
     // Draw all layers in order (hind legs behind, then body, then front legs)

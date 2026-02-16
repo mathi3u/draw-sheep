@@ -7,6 +7,7 @@ import {
   updateSheep,
   triggerJump,
   getPlanetGeometry,
+  getVisibleArcRange,
   planetSurfacePosition,
   SHEEP_WIDTH,
   SHEEP_HEIGHT,
@@ -21,6 +22,8 @@ import { hitTest } from '@/lib/hit-detection'
 interface SheepCanvasProps {
   sheep: SheepDrawing[]
   onRemoveSheep: (id: string) => void
+  newSheepId?: string | null
+  onNewSheepPlaced?: () => void
 }
 
 function renderSheepOnSurface(
@@ -62,25 +65,28 @@ function renderSheepOnSurface(
   ctx.scale(scaleX, scaleY)
   ctx.translate(-DRAWING_WIDTH / 2, -DRAWING_HEIGHT)
 
+  // All layers render in uniform white on the main canvas
+  const color = '#ffffff'
+
   // Hind legs (with walk animation)
   ctx.save()
   ctx.translate(0, legOffset)
-  renderStrokes(ctx, drawing.hindLegs)
+  renderStrokes(ctx, drawing.hindLegs, color)
   ctx.restore()
 
   // Body
-  renderStrokes(ctx, drawing.body)
+  renderStrokes(ctx, drawing.body, color)
 
   // Front legs (opposite offset)
   ctx.save()
   ctx.translate(0, -legOffset)
-  renderStrokes(ctx, drawing.frontLegs)
+  renderStrokes(ctx, drawing.frontLegs, color)
   ctx.restore()
 
   ctx.restore()
 }
 
-export default function SheepCanvas({ sheep, onRemoveSheep }: SheepCanvasProps) {
+export default function SheepCanvas({ sheep, onRemoveSheep, newSheepId, onNewSheepPlaced }: SheepCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const runningSheepRef = useRef<RunningSheep[]>([])
   const animFrameRef = useRef<number>(0)
@@ -100,14 +106,20 @@ export default function SheepCanvas({ sheep, onRemoveSheep }: SheepCanvasProps) 
 
     for (const s of sheep) {
       if (!prevIds.has(s.id)) {
-        runningSheepRef.current.push(
-          initRunningSheep(s, canvas.width, canvas.height),
-        )
+        const rs = initRunningSheep(s, canvas.width, canvas.height)
+        // Newly drawn sheep enter from the left edge of the arc
+        if (s.id === newSheepId) {
+          const geo = getPlanetGeometry(canvas.width, canvas.height)
+          const arc = getVisibleArcRange(geo, canvas.width, canvas.height)
+          rs.angle = arc.start + 0.15
+          onNewSheepPlaced?.()
+        }
+        runningSheepRef.current.push(rs)
       }
     }
 
     prevSheepIdsRef.current = currentIds
-  }, [sheep])
+  }, [sheep, newSheepId, onNewSheepPlaced])
 
   useEffect(() => {
     syncSheep()

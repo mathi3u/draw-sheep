@@ -13,6 +13,7 @@ export default function Home() {
   const [allSheep, setAllSheep] = useState<SheepDrawing[]>([])
   const [showDraw, setShowDraw] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
+  const [newSheepId, setNewSheepId] = useState<string | null>(null)
 
   const refresh = useCallback(() => {
     setActiveSheep(getActiveSheep())
@@ -20,15 +21,17 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    // Pre-populate sample sheep on first visit
-    if (getSheep().length === 0) {
+    const isFirstVisit = getSheep().length === 0
+    if (isFirstVisit) {
       addSampleSheep()
+      setShowDraw(true)
     }
     refresh()
   }, [refresh])
 
   const handleSubmit = (layers: { body: Stroke[]; hindLegs: Stroke[]; frontLegs: Stroke[] }) => {
-    addSheep(layers)
+    const sheep = addSheep(layers)
+    setNewSheepId(sheep.id)
     refresh()
     setShowDraw(false)
   }
@@ -47,7 +50,20 @@ export default function Home() {
 
   return (
     <>
-      <SheepCanvas sheep={activeSheep} onRemoveSheep={handleRemove} />
+      <SheepCanvas
+        sheep={activeSheep}
+        onRemoveSheep={handleRemove}
+        newSheepId={newSheepId}
+        onNewSheepPlaced={() => setNewSheepId(null)}
+      />
+
+      {/* Title */}
+      <h1
+        className="fixed top-6 left-8 z-10 text-white/80 text-3xl md:text-4xl font-bold pointer-events-none select-none"
+        style={{ fontFamily: "'Little Days', cursive" }}
+      >
+        Dessine-moi un mouton
+      </h1>
 
       {/* Draw button */}
       <button

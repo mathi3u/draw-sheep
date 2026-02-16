@@ -13,6 +13,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
+      <head>
+        <link href="https://fonts.cdnfonts.com/css/little-days" rel="stylesheet" />
+      </head>
       <body>{children}</body>
     </html>
   )
