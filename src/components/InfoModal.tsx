@@ -35,10 +35,14 @@ export default function InfoModal({ onClose, onAmnesty, sheepCount, removedCount
             <p><strong className="text-white/90">Double-cliquer</strong> pour le retirer</p>
           </div>
 
-          <div className="border-t border-white/10 pt-3 mt-3">
-            <p className="text-xs text-white/40 mb-1">
+          <div className="border-t border-white/10 pt-3 mt-3 space-y-2">
+            <p className="text-xs text-white/40">
               {sheepCount} mouton{sheepCount !== 1 ? 's' : ''} actif{sheepCount !== 1 ? 's' : ''}
               {removedCount > 0 && ` / ${removedCount} retire${removedCount !== 1 ? 's' : ''}`}
+            </p>
+            <p className="text-xs text-white/30">
+              Inspired shamelessly by{' '}
+              <a href="https://gradient.horse" target="_blank" rel="noopener noreferrer" className="underline hover:text-white/50">gradient.horse</a>
             </p>
           </div>
         </div>

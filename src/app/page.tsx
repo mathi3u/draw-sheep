@@ -61,8 +61,8 @@ export default function Home() {
         // Seed sample sheep on first visit
         await fetch('/api/sheep/seed', { method: 'POST' })
         await fetchSheep()
-        setShowDraw(true)
       }
+      setShowDraw(true)
       setLoaded(true)
     })
   }, [fetchSheep])
