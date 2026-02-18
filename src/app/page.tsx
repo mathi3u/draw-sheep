@@ -4,7 +4,11 @@ import { useCallback, useEffect, useState } from 'react'
 import SheepCanvas from '@/components/SheepCanvas'
 import DrawModal from '@/components/DrawModal'
 import InfoModal from '@/components/InfoModal'
+import GalleryModal from '@/components/GalleryModal'
 import type { SheepDrawing, Stroke } from '@/lib/types'
+
+const MIN_WIDTH = 520
+const MIN_HEIGHT = 400
 
 // Irregular stone shapes — 4 variants to pick from
 const stonePaths = [
@@ -43,8 +47,10 @@ export default function Home() {
   const [allSheep, setAllSheep] = useState<SheepDrawing[]>([])
   const [showDraw, setShowDraw] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
+  const [showGallery, setShowGallery] = useState(false)
   const [newSheepId, setNewSheepId] = useState<string | null>(null)
   const [loaded, setLoaded] = useState(false)
+  const [tooSmall, setTooSmall] = useState(false)
 
   const activeSheep = allSheep.filter(s => !s.removed)
 
@@ -66,6 +72,13 @@ export default function Home() {
       setLoaded(true)
     })
   }, [fetchSheep])
+
+  useEffect(() => {
+    const check = () => setTooSmall(window.innerWidth < MIN_WIDTH || window.innerHeight < MIN_HEIGHT)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   const handleSubmit = async (layers: { body: Stroke[]; hindLegs: Stroke[]; frontLegs: Stroke[] }) => {
     const res = await fetch('/api/sheep', {
@@ -110,7 +123,19 @@ export default function Home() {
         Dessine-moi un mouton
       </h1>
 
-      {/* Stone buttons */}
+      {/* Gallery button — bottom left */}
+      <div className="fixed bottom-5 left-5 z-10">
+        <StoneButton onClick={() => setShowGallery(true)} label="Gallery">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <rect x="1" y="1" width="7" height="7" rx="1.5" />
+            <rect x="12" y="1" width="7" height="7" rx="1.5" />
+            <rect x="1" y="12" width="7" height="7" rx="1.5" />
+            <rect x="12" y="12" width="7" height="7" rx="1.5" />
+          </svg>
+        </StoneButton>
+      </div>
+
+      {/* Stone buttons — bottom right */}
       <div className="fixed bottom-5 right-5 z-10 flex items-end gap-2">
         <StoneButton onClick={() => setShowDraw(true)} label="Draw a sheep">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -137,6 +162,31 @@ export default function Home() {
           sheepCount={activeSheep.length}
           removedCount={removedCount}
         />
+      )}
+
+      {showGallery && (
+        <GalleryModal
+          onClose={() => setShowGallery(false)}
+          sheep={allSheep}
+        />
+      )}
+
+      {/* Screen too small overlay */}
+      {tooSmall && (
+        <div className="fixed inset-0 z-[100] bg-[#0d1127] flex flex-col items-center justify-center text-white/70 p-8 text-center">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="mb-6 text-white/40">
+            <rect x="4" y="10" width="40" height="28" rx="3" />
+            <line x1="24" y1="38" x2="24" y2="42" />
+            <line x1="18" y1="42" x2="30" y2="42" />
+          </svg>
+          <p className="text-lg mb-2" style={{ fontFamily: "'Caveat', cursive" }}>
+            Ecran trop petit
+          </p>
+          <p className="text-sm text-white/40 max-w-[280px]">
+            Cette experience necessite un ecran d&apos;au moins {MIN_WIDTH}&times;{MIN_HEIGHT}px.
+            Essaie en paysage ou sur un ecran plus grand.
+          </p>
+        </div>
       )}
     </>
   )

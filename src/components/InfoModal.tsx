@@ -41,7 +41,7 @@ export default function InfoModal({ onClose, onAmnesty, sheepCount, removedCount
               {removedCount > 0 && ` / ${removedCount} retire${removedCount !== 1 ? 's' : ''}`}
             </p>
             <p className="text-xs text-white/30">
-              Inspired shamelessly by{' '}
+              Inspired by{' '}
               <a href="https://gradient.horse" target="_blank" rel="noopener noreferrer" className="underline hover:text-white/50">gradient.horse</a>
             </p>
           </div>
