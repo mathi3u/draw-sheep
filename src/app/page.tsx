@@ -123,8 +123,8 @@ export default function Home() {
         Dessine-moi un mouton
       </h1>
 
-      {/* Gallery button — bottom left */}
-      <div className="fixed bottom-5 left-5 z-10">
+      {/* Stone buttons — bottom right */}
+      <div className="fixed bottom-5 right-5 z-10 flex items-end gap-2">
         <StoneButton onClick={() => setShowGallery(true)} label="Gallery">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
             <rect x="1" y="1" width="7" height="7" rx="1.5" />
@@ -133,10 +133,6 @@ export default function Home() {
             <rect x="12" y="12" width="7" height="7" rx="1.5" />
           </svg>
         </StoneButton>
-      </div>
-
-      {/* Stone buttons — bottom right */}
-      <div className="fixed bottom-5 right-5 z-10 flex items-end gap-2">
         <StoneButton onClick={() => setShowDraw(true)} label="Draw a sheep">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="11" y1="4" x2="11" y2="18" />
