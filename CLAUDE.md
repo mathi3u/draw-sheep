@@ -65,11 +65,12 @@ Sheep walk on a curved moon surface using angle-based positioning:
 - Visible arc range calculated from viewport intersection with the sphere
 
 ### Component Structure
-- `app/page.tsx` — Main page, fetches sheep from API, stone buttons (+ and ?)
+- `app/page.tsx` — Main page, fetches sheep from API, stone buttons (gallery, +, ?), screen size guard
 - `app/api/sheep/` — API routes for CRUD
 - `components/SheepCanvas.tsx` — Full-screen animation canvas
 - `components/DrawModal.tsx` — Drawing interface (dark canvas, 3 layers, pointer events)
 - `components/InfoModal.tsx` — Explainer with gradient.horse credit
+- `components/GalleryModal.tsx` — Grid of all sheep as mini canvas thumbnails
 - `lib/db.ts` — Turso client (web)
 - `lib/animation.ts` — Angle-based movement, planet geometry, jump physics
 - `lib/background.ts` — Sky, stars, moon surface, craters, flowers
