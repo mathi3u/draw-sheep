@@ -47,6 +47,11 @@ Frontend (`page.tsx`) → API routes (`/api/sheep/*`) → Turso DB (`@libsql/cli
 - `DELETE /api/sheep/[id]` — Soft-remove a sheep
 - `POST /api/sheep/amnesty` — Restore all removed sheep
 - `POST /api/sheep/seed` — Seed sample sheep (runs once when DB is empty)
+- `GET /api/admin/sheep` — Fetch ALL sheep (including removed), auth required
+- `DELETE /api/admin/sheep/[id]` — Hard-delete a sheep, auth required
+
+### Admin Page (`/admin`)
+Password-protected page for moderating inappropriate drawings. Shows grid of all sheep (removed ones dimmed). Hover to reveal delete button for permanent removal. Auth via `ADMIN_PASSWORD` env var sent in `Authorization` header.
 
 ### Drawing System
 Each sheep = 3 canvas layers drawn separately:
@@ -66,7 +71,9 @@ Sheep walk on a curved moon surface using angle-based positioning:
 
 ### Component Structure
 - `app/page.tsx` — Main page, fetches sheep from API, stone buttons (gallery, +, ?), screen size guard
+- `app/admin/page.tsx` — Admin page (password-protected, sheep moderation)
 - `app/api/sheep/` — API routes for CRUD
+- `app/api/admin/sheep/` — Admin API routes (auth-protected, hard-delete)
 - `components/SheepCanvas.tsx` — Full-screen animation canvas
 - `components/DrawModal.tsx` — Drawing interface (dark canvas, 3 layers, pointer events)
 - `components/InfoModal.tsx` — Explainer with gradient.horse credit
@@ -82,5 +89,6 @@ Sheep walk on a curved moon surface using angle-based positioning:
 ```
 TURSO_DATABASE_URL=libsql://draw-sheep-emrom.aws-eu-west-1.turso.io
 TURSO_AUTH_TOKEN=<token>
+ADMIN_PASSWORD=<password>
 ```
 Set in `.env.local` (gitignored) and Netlify env vars.
