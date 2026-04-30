@@ -1,5 +1,9 @@
 # CLAUDE.md
 
+## Knowledge Base
+- **Obsidian vault folder**: `~/Documents/Obsidian/KnowledgeBase/`
+- **Project folder**: `Projects/Personal/DrawSheep/`
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
